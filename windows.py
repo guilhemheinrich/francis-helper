@@ -1,4 +1,4 @@
-#! python
+#! /usr/local/bin/python3
 
 try:
     import tkinter as tk
@@ -28,12 +28,15 @@ window = tk.Tk()
 
 
 def export():
-    # extension_list = re.split('[^\w]*,[^\w]*', extensions.get())
+    extension_list = re.split(r'[^\w]*,[^\w]*', extensions.get())
+    print(extension_list)
     with open(os.path.join(targetPath.get(), 'log.txt'), 'w') as out_file:
         for folder, subs, files in os.walk(sourcePath.get()):
             for filename in files:
                 basename = os.path.splitext(filename)[0]
-                if (len(basename) <= maxLength.get()) and (len(basename) >= minLength.get()):
+                extension = os.path.splitext(filename)[1][1:]
+                print(extension)
+                if (len(basename) <= maxLength.get()) and (len(basename) >= minLength.get()) and not basename.startswith('.') and extension in extension_list:
                     shutil.copyfile(os.path.join(folder, filename), os.path.join(targetPath.get(), filename))
                     print(filename)
                     out_file.write(os.path.join(folder, filename) + '\n')
@@ -62,15 +65,15 @@ targetButton = tk.Button(window, text="Dossier cible", command=selectTarget)
 
 executeButton = tk.Button(window, text="Execute", command=export)
 
-minLength = tk.IntVar(value=5)
-maxLength = tk.IntVar(value=5)
+minLength = tk.IntVar(value=9)
+maxLength = tk.IntVar(value=50)
 minLengthEntry = tk.Entry(window, textvariable=minLength )
 maxLengthEntry = tk.Entry(window, textvariable=maxLength )
-# extensions = tk.StringVar(value="jpg")
-# extensionsEntry = tk.Entry(window, textvariable=extensions)
+extensions = tk.StringVar(value="jpg, jpeg, tif, tiff")
+extensionsEntry = tk.Entry(window, textvariable=extensions)
 minLabel = tk.Label(window, textvariable=tk.StringVar(value="Taille du nom de fichier minimum"))
 maxLabel = tk.Label(window, textvariable=tk.StringVar(value="Taille du nom de fichier maximum"))
-# extensionsLabel = tk.Label(window, textvariable=tk.StringVar(value="Extensions (liste séparée par des virgules)"))
+extensionsLabel = tk.Label(window, textvariable=tk.StringVar(value="Extensions (liste séparée par des virgules)"))
 sourceSelected = tk.Label(window,  textvariable = sourceString)
 targetSelected = tk.Label(window, textvariable = targetString)
 # layout
@@ -78,8 +81,8 @@ minLabel.pack()
 minLengthEntry.pack()
 maxLabel.pack()
 maxLengthEntry.pack()
-# extensionsLabel.pack()
-# extensionsEntry.pack()
+extensionsLabel.pack()
+extensionsEntry.pack()
 sourceButton.pack()
 targetButton.pack()
 sourceSelected.pack()
