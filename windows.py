@@ -1,3 +1,5 @@
+#! python
+
 try:
     import tkinter as tk
     import tkinter.ttk as ttk
@@ -27,12 +29,14 @@ window = tk.Tk()
 
 def export():
     # extension_list = re.split('[^\w]*,[^\w]*', extensions.get())
-    for folder, subs, files in os.walk(sourcePath.get()):
-        for filename in files:
-            basename = os.path.splitext(filename)[0]
-            if (len(basename) <= maxLength.get()) and (len(basename) >= minLength.get()):
-                shutil.copyfile(os.path.join(folder, filename), os.path.join(targetPath.get(), filename))
-                print(filename)
+    with open(os.path.join(targetPath.get(), 'log.txt'), 'w') as out_file:
+        for folder, subs, files in os.walk(sourcePath.get()):
+            for filename in files:
+                basename = os.path.splitext(filename)[0]
+                if (len(basename) <= maxLength.get()) and (len(basename) >= minLength.get()):
+                    shutil.copyfile(os.path.join(folder, filename), os.path.join(targetPath.get(), filename))
+                    print(filename)
+                    out_file.write(os.path.join(folder, filename) + '\n')
 
 
 sourceString = tk.StringVar(value='Aucun dossier source sélectionné')
@@ -51,7 +55,7 @@ def selectTarget():
     folderString = filedialog.askdirectory()
     if folderString:
         targetPath.set(folderString)
-        targetString.set('Destination actuelle: ' + sourcePath.get())
+        targetString.set('Destination actuelle: ' + targetPath.get())
 
 targetButton = tk.Button(window, text="Dossier cible", command=selectTarget)
 
